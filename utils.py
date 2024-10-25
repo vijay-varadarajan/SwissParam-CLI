@@ -1,7 +1,6 @@
 # swissparam/utils.py
 
 import requests
-import os
 import logging
 from typing import Dict, Any
 
@@ -14,10 +13,10 @@ def check_server(base_url: str) -> bool:
     try:
         response = requests.get(base_url)
         response.raise_for_status()
-        logger.info("Server is reachable.")
+        logger.info(" Server is reachable.")
         return True
     except requests.RequestException as e:
-        logger.error(f"Error connecting to server: {e}")
+        logger.error(f" Error connecting to server: {e}")
         return False
 
 
@@ -47,7 +46,7 @@ def start_parameterization(base_url: str, is_covalent: bool, mol2_file: str, **k
         response = requests.post(url, files=files, params=params, data=data)
         response.raise_for_status()
         session_number = response.text.split("=")[-1].strip().rstrip('"')
-        logger.info(f"Parameterization started. Session number: {session_number}")
+        logger.info(f" Parameterization started. Session number: {session_number}")
         return session_number
 
 
@@ -67,7 +66,7 @@ def retrieve_results(base_url: str, session_number: str, filename: str) -> None:
     
     with open(filename, 'wb') as f:
         f.write(response.content)
-    logger.info(f"Results downloaded as {filename}.")
+    logger.info(f" Results downloaded as {filename}.")
 
 
 def cancel_session(base_url: str, session_number: str) -> None:
@@ -75,4 +74,4 @@ def cancel_session(base_url: str, session_number: str) -> None:
     response = requests.get(f"{base_url}/cancelsession", 
                           params={'sessionNumber': session_number})
     response.raise_for_status()
-    logger.info(f"Session {session_number} cancelled.")
+    logger.info(f" Session {session_number} cancelled.")

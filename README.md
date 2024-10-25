@@ -24,6 +24,7 @@ The `swissparam.py` script is a command-line utility for parameterizing small mo
 - `sys` library (included in Python's standard library)
 - `time` library (included in Python's standard library)
 - `signal` library (included in Python's standard library)
+- `logging` library (included in Python's standard library)
 - accompanying `utils.py` file and `config.py` file
 
 You can install the required library using pip:

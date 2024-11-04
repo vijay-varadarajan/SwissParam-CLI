@@ -1,6 +1,26 @@
+'''
+Documentation:
+
+    This script is allows you to use the SwissParam web service to parameterize a molecule. It takes a molecule file (.mol2) as input and sends it to the SwissParam server for parameterization. It returns as output a tar.gz file containing the parameterized molecule.
+    
+    - A post request is sent to the SwissParam server with the molecule file and the desired parameters. 
+    - The session number is retrieved from the response
+    - Status of the session is checked at regular intervals (5 seconds by default)
+    - Once the session is finished, the results are downloaded and saved as 'results.tar.gz'
+    
+    Usage:
+        python swissparam_simple_noncovalent.py -f molecule.mol2 [--hydrogen {yes / no}]
+    
+        -f, --filename: Path to the molecule file (.mol2). This is a required argument.
+        -y, --hydrogen: [Default: no] Include hydrogen atoms (only for non-covalent). If your Mol2 file does not contain hydrogens, you can set this option to 'yes', it will protonate the molecule at pH 7.4.
+        
+    Approach is set to mmff-based by default
+    Charmm c27 is used by default
+'''
+
+
 # in-built libraries
 import argparse
-import signal
 import time
 import sys
 import os
@@ -45,12 +65,20 @@ def start_parameterization(base_url: str, mol2_file: str, **kwargs) -> str:
         
         params = {
             'approach': 'mmff-based',
-            'hydrogen': kwargs.get('hydrogen', 'yes')
         }
-        data = {'charm': 'c27'}
-
-        response = requests.post(url, files=files, params=params, data=data)
+        
+        add_hydrogen = False        
+        if kwargs.get('hydrogen') == 'yes':
+            add_hydrogen = True
+            
+        charmm = 'c27'
+        
+        url += f"?approach={params['approach']}{'&addH' if add_hydrogen else ''}&{charmm}" 
+        
+        response = requests.post(url, files=files)
+        print(response.text)
         response.raise_for_status()
+        
         session_number = response.text.split("=")[-1].strip().rstrip('"')
         logger.info(f" Parameterization started. Session number: {session_number}")
         return session_number
